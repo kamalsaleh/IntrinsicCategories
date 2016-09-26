@@ -86,3 +86,4 @@ Display( last );
 #! z 
 #! 
 #! A morphism in Category of left presentations of Q[x,y,z]
+
