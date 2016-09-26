@@ -840,14 +840,20 @@ InstallMethod( TurnAutoequivalenceIntoIdentityFunctor,
     
     AddObjectFunction( IdF,
             function( obj )
-              local a, eta_a;
+              local a, eta_a, info;
               
               a := ActiveCell( obj );
+              
               eta_a := ApplyNaturalTransformation( e, a );
+              
+              info := Concatenation( "position_of_active_cell_before_applying_the_functor ", Name( IdF ) );
+                 
+              obj!.( info ) := PositionOfActiveCell( obj );
               
               if IsEqualForObjects( Range( eta_a ), a ) and
                  IsCongruentForMorphisms( eta_a, IdentityMorphism( a ) ) then
-                  return obj;
+                 
+                 return obj;
               fi;
               
               AddTransitionIsomorphism( obj, PositionOfActiveCell( obj ), eta_a );
@@ -858,9 +864,15 @@ InstallMethod( TurnAutoequivalenceIntoIdentityFunctor,
     
     AddMorphismFunction( IdF,
             function( new_source, mor, new_range )
-              local a, b;
+              local a, b, source_pos, range_pos, info;
               
-              a := ActiveCell( mor );
+              info := Concatenation( "position_of_active_cell_before_applying_the_functor ", Name( IdF ) );
+              
+              source_pos := new_source!.( info );
+              
+              range_pos := new_range!.( info );
+              
+              a := CertainCell( mor,  source_pos, range_pos );
               
               b := ApplyFunctor( F, a );
               
