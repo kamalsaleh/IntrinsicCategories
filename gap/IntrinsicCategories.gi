@@ -846,7 +846,7 @@ InstallMethod( TurnAutoequivalenceIntoIdentityFunctor,
               
               eta_a := ApplyNaturalTransformation( e, a );
               
-              info := Concatenation( "position of active cell before applying the functor ", Name( IdF ) );
+              info := Concatenation( "position of active cell before last apply of the functor ", Name( IdF ) );
                  
               obj!.( info ) := PositionOfActiveCell( obj );
               
@@ -866,7 +866,7 @@ InstallMethod( TurnAutoequivalenceIntoIdentityFunctor,
             function( new_source, mor, new_range )
               local a, b, source_pos, range_pos, info;
               
-              info := Concatenation( "position of active cell before applying the functor ", Name( IdF ) );
+              info := Concatenation( "position of active cell before last apply of the functor ", Name( IdF ) );
               
               source_pos := new_source!.( info );
               
