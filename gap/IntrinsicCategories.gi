@@ -590,7 +590,7 @@ InstallMethod( TransitionIsomorphism,
         [ IsCapCategoryIntrinsicObjectRep, IsInt, IsInt ],
         
   function( obj, s, t )
-    local tr, st, eta;
+    local tr, st, eta, E, V, path, shortest_path;
     
     tr := obj!.TransitionIsomorphisms;
     
@@ -622,8 +622,58 @@ InstallMethod( TransitionIsomorphism,
         
     fi;
     
-    Error( "non of the transition isomorphisms at positions ", [ s, t ], " or ", [ t, s ], " exist\n" );
+#     Error( "non of the transition isomorphisms at positions ", [ s, t ], " or ", [ t, s ], " exist\n" );
     
+    # In the following we use Dijkstra's algorithm to find the shortest path between s and t.
+    shortest_path := function( V, E, s, t )
+    local dis, done, current, visited, unvisited, neighbors, v, m, pre, u, path, i;
+    
+    dis := List( V, i->"inf" );
+    pre := List( V, i->"undef" );
+    dis[ s ] := 0;
+    current := s;
+    visited := [ ];
+    unvisited := ShallowCopy( V );
+    SubtractSet( unvisited, [ s ] );
+    done := false;
+    while not done do
+        neighbors := [];
+        for v in unvisited do
+            if ( String( [ current, v ] ) in E ) or ( String( [ v, current ] ) in E ) then 
+            Add( neighbors, v );
+                if dis[ v ] = "inf" or dis[ v ] > dis[ current ] + 1 then 
+                    dis[ v ] := dis[ current ] + 1;
+                    pre[ v ] := current;
+                fi;
+            fi;
+        od;
+        Add( visited, current );
+        SubtractSet( unvisited, visited );
+        done := t in visited or Length( unvisited ) = 0;
+        if done = true then
+            break;
+        fi;
+        m := Minimum( List( unvisited, u -> dis[ u ] ) );
+        current := unvisited[ Position( List( unvisited, u -> dis[ u ] ), m ) ];
+        od;
+        u := t;
+        path := [ u ];
+        for i in [ 1 .. dis[ t ] ] do
+            u := pre[ u ];
+            Add( path, u, 1 );
+        od;
+            
+    return path;
+    end;
+    
+    E := NamesOfComponents( obj!.TransitionIsomorphisms );
+    
+    V := [ 1 .. PositionOfLastStoredCell( obj ) ];
+    
+    path := shortest_path( V, E, s, t );
+    
+    return PreCompose( List( [ 1 .. Length( path ) - 1 ], i -> TransitionIsomorphism( obj, path[ i ], path[ i + 1 ] ) ) );
+
 end );
 
 ##
